@@ -21,7 +21,6 @@ func main() {
 	var textEdit *walk.TextEdit
 	var valueEdit *walk.NumberEdit
 	foo := &Foo{"b", 0}
-
 	MainWindow{
 		Title:   "AI Frame",
 		MinSize: Size{Width: 320, Height: 240},
