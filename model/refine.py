@@ -1,10 +1,9 @@
 import torch
-import torch.nn as nn
 import numpy as np
+import torch.nn as nn
 import torch.optim as optim
-import itertools
-from model.warplayer import warp
 import torch.nn.functional as F
+from model.warplayer import warp
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 

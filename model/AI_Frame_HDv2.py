@@ -6,7 +6,7 @@ import torch.optim as optim
 import itertools
 from model.warplayer import warp
 from torch.nn.parallel import DistributedDataParallel as DDP
-from model.oldmodel.IFNet_HDv2 import *
+#from model.oldmodel.IFNet_HDv2 import *
 import torch.nn.functional as F
 from model.loss import *
 
@@ -113,7 +113,7 @@ class FusionNet(nn.Module):
 
 class Model:
     def __init__(self, local_rank=-1):
-        self.flownet = IFNet()
+        #self.flownet = IFNet()
         self.contextnet = ContextNet()
         self.fusionnet = FusionNet()
         self.device()

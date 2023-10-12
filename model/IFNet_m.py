@@ -1,8 +1,8 @@
 import torch
 import torch.nn as nn
+from model.refine import *
 import torch.nn.functional as F
 from model.warplayer import warp
-from model.refine import *
 
 def deconv(in_planes, out_planes, kernel_size=4, stride=2, padding=1):
     return nn.Sequential(
@@ -64,7 +64,7 @@ class IFNet_m(nn.Module):
         timestep = (x[:, :1].clone() * 0 + 1) * timestep
         img0 = x[:, :3]
         img1 = x[:, 3:6]
-        gt = x[:, 6:] # In inference time, gt is None
+        gt = x[:, 6:]  
         flow_list = []
         merged = []
         mask_list = []

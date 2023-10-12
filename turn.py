@@ -80,19 +80,19 @@ if torch.cuda.is_available():
 try:
     try:
         try:
-            from model.RIFE_HDv2 import Model
+            from model.AI_Frame_HDv2 import Model
             model = Model()
             model.load_model(args.modelDir, -1)
         except:
-            from train_log.RIFE_HDv3 import Model
+            from train_log.AI_Frame_HDv3 import Model
             model = Model()
             model.load_model(args.modelDir, -1)
     except:
-        from model.RIFE_HD import Model
+        from model.AI_Frame_HD import Model
         model = Model()
         model.load_model(args.modelDir, -1)
 except:
-    from model.RIFE import Model
+    from model.AI_Frame import Model
     model = Model()
     model.load_model(args.modelDir, -1)
 model.eval()

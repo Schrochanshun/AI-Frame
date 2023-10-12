@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/lxn/walk"
-	. "github.com/lxn/walk/declarative"
 	"os/exec"
 	"strings"
 	"strconv"
+	"github.com/lxn/walk"
+	. "github.com/lxn/walk/declarative"
 )
 
 type Foo struct {

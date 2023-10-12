@@ -1,14 +1,13 @@
 import torch
-import torch.nn as nn
 import numpy as np
-from torch.optim import AdamW
-import torch.optim as optim
-import itertools
-from model.warplayer import warp
-from torch.nn.parallel import DistributedDataParallel as DDP
-from train_log.IFNet_HDv3 import *
-import torch.nn.functional as F
+import torch.nn as nn
 from model.loss import *
+import torch.optim as optim
+from torch.optim import AdamW
+import torch.nn.functional as F
+from model.warplayer import warp
+from train_log.IFNet_HDv3 import *
+from torch.nn.parallel import DistributedDataParallel as DDP
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     
@@ -18,7 +17,6 @@ class Model:
         self.device()
         self.optimG = AdamW(self.flownet.parameters(), lr=1e-6, weight_decay=1e-4)
         self.epe = EPE()
-        # self.vgg = VGGPerceptualLoss().to(device)
         self.sobel = SOBEL()
         if local_rank != -1:
             self.flownet = DDP(self.flownet, device_ids=[local_rank], output_device=local_rank)
@@ -71,11 +69,8 @@ class Model:
         flow, mask, merged = self.flownet(torch.cat((imgs, gt), 1), scale=scale, training=training)
         loss_l1 = (merged[2] - gt).abs().mean()
         loss_smooth = self.sobel(flow[2], flow[2]*0).mean()
-        # loss_vgg = self.vgg(merged[2], gt)
         if training:
             self.optimG.zero_grad()
-            loss_G = loss_cons + loss_smooth * 0.1
-            loss_G.backward()
             self.optimG.step()
         else:
             flow_teacher = flow[2]
@@ -83,6 +78,5 @@ class Model:
             'mask': mask,
             'flow': flow[2][:, :2],
             'loss_l1': loss_l1,
-            'loss_cons': loss_cons,
             'loss_smooth': loss_smooth,
             }
