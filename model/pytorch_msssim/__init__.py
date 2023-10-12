@@ -1,7 +1,7 @@
 import torch
-import torch.nn.functional as F
-from math import exp
 import numpy as np
+from math import exp
+import torch.nn.functional as F
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -25,7 +25,6 @@ def create_window_3d(window_size, channel=1):
 
 
 def ssim(img1, img2, window_size=11, window=None, size_average=True, full=False, val_range=None):
-    # Value range can be different from 255. Other common ranges are 1 (sigmoid) and 2 (tanh).
     if val_range is None:
         if torch.max(img1) > 128:
             max_val = 255
@@ -46,8 +45,6 @@ def ssim(img1, img2, window_size=11, window=None, size_average=True, full=False,
         real_size = min(window_size, height, width)
         window = create_window(real_size, channel=channel).to(img1.device)
     
-    # mu1 = F.conv2d(img1, window, padding=padd, groups=channel)
-    # mu2 = F.conv2d(img2, window, padding=padd, groups=channel)
     mu1 = F.conv2d(F.pad(img1, (5, 5, 5, 5), mode='replicate'), window, padding=padd, groups=channel)
     mu2 = F.conv2d(F.pad(img2, (5, 5, 5, 5), mode='replicate'), window, padding=padd, groups=channel)
 
@@ -64,8 +61,7 @@ def ssim(img1, img2, window_size=11, window=None, size_average=True, full=False,
 
     v1 = 2.0 * sigma12 + C2
     v2 = sigma1_sq + sigma2_sq + C2
-    cs = torch.mean(v1 / v2)  # contrast sensitivity
-
+    cs = torch.mean(v1 / v2)  # 对比敏感度
     ssim_map = ((2 * mu1_mu2 + C1) * v1) / ((mu1_sq + mu2_sq + C1) * v2)
 
     if size_average:
@@ -79,7 +75,6 @@ def ssim(img1, img2, window_size=11, window=None, size_average=True, full=False,
 
 
 def ssim_matlab(img1, img2, window_size=11, window=None, size_average=True, full=False, val_range=None):
-    # Value range can be different from 255. Other common ranges are 1 (sigmoid) and 2 (tanh).
     if val_range is None:
         if torch.max(img1) > 128:
             max_val = 255
@@ -99,7 +94,6 @@ def ssim_matlab(img1, img2, window_size=11, window=None, size_average=True, full
     if window is None:
         real_size = min(window_size, height, width)
         window = create_window_3d(real_size, channel=1).to(img1.device)
-        # Channel is set to 1 since we consider color images as volumetric images
 
     img1 = img1.unsqueeze(1)
     img2 = img2.unsqueeze(1)
@@ -120,7 +114,7 @@ def ssim_matlab(img1, img2, window_size=11, window=None, size_average=True, full
 
     v1 = 2.0 * sigma12 + C2
     v2 = sigma1_sq + sigma2_sq + C2
-    cs = torch.mean(v1 / v2)  # contrast sensitivity
+    cs = torch.mean(v1 / v2)  # 对比敏感度
 
     ssim_map = ((2 * mu1_mu2 + C1) * v1) / ((mu1_sq + mu2_sq + C1) * v2)
 
@@ -151,19 +145,17 @@ def msssim(img1, img2, window_size=11, size_average=True, val_range=None, normal
     mssim = torch.stack(mssim)
     mcs = torch.stack(mcs)
 
-    # Normalize (to avoid NaNs during training unstable models, not compliant with original definition)
     if normalize:
         mssim = (mssim + 1) / 2
         mcs = (mcs + 1) / 2
 
     pow1 = mcs ** weights
     pow2 = mssim ** weights
-    # From Matlab implementation https://ece.uwaterloo.ca/~z70wang/research/iwssim/
+    # https://ece.uwaterloo.ca/~z70wang/research/iwssim/
     output = torch.prod(pow1[:-1] * pow2[-1])
     return output
 
 
-# Classes to re-use window
 class SSIM(torch.nn.Module):
     def __init__(self, window_size=11, size_average=True, val_range=None):
         super(SSIM, self).__init__()
@@ -171,7 +163,6 @@ class SSIM(torch.nn.Module):
         self.size_average = size_average
         self.val_range = val_range
 
-        # Assume 3 channel for SSIM
         self.channel = 3
         self.window = create_window(window_size, channel=self.channel)
 

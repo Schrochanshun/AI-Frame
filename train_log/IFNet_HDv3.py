@@ -75,8 +75,6 @@ class IFNet(nn.Module):
         self.block1 = IFBlock(7+4, c=90)
         self.block2 = IFBlock(7+4, c=90)
         self.block_tea = IFBlock(10+4, c=90)
-        # self.contextnet = Contextnet()
-        # self.unet = Unet()
 
     def forward(self, x, scale_list=[4, 2, 1], training=False):
         if training == False:
@@ -110,6 +108,5 @@ class IFNet(nn.Module):
         '''
         for i in range(3):
             mask_list[i] = torch.sigmoid(mask_list[i])
-            merged[i] = merged[i][0] * mask_list[i] + merged[i][1] * (1 - mask_list[i])
-            # merged[i] = torch.clamp(merged[i] + res, 0, 1)        
+            merged[i] = merged[i][0] * mask_list[i] + merged[i][1] * (1 - mask_list[i])       
         return flow_list, mask_list[2], merged
